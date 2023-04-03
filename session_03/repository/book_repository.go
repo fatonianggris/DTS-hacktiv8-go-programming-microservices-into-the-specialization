@@ -7,6 +7,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+const createBooksTable = `
+CREATE TABLE IF NOT EXISTS books (
+	id SERIAL PRIMARY KEY,
+	title TEXT,
+	author TEXT,
+	description TEXT
+)
+`
+
 type BookRepository struct {
 	db *sql.DB
 }
@@ -19,6 +28,12 @@ func NewDB() (*sql.DB, error) {
 	db, err := sql.Open("postgres", "postgres://user:password@localhost/bookstore?sslmode=disable")
 	if err != nil {
 		return nil, err
+	}
+	defer db.Close()
+
+	_, err = db.Exec(createBooksTable)
+	if err != nil {
+		panic(err)
 	}
 
 	err = db.Ping()
